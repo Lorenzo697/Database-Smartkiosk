@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smartkiosk — Gestionale</title>
+<meta name="theme-color" content="#003d66">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Smartkiosk">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--blue:#003d66;--blue-md:#005a94;--blue-lt:#e6f0f7;--green:#76b72a;--green-lt:#eef6df;--green-dk:#5a8c1f;--gray:#f1f2f1;--gray-md:#d8dbd8;--gray-dk:#9aa09a;--text:#1a2a1a;--text-lt:#4a5a4a;--white:#ffffff;--border:#d0d8d0;--danger:#c0392b;--danger-lt:#fdf0ee;--warn:#e67e22;--warn-lt:#fef5ec;--radius:6px;--radius-lg:10px;--shadow:0 1px 4px rgba(0,61,102,0.08),0 4px 16px rgba(0,61,102,0.05);--shadow-lg:0 8px 32px rgba(0,61,102,0.14);--font:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;--tr:0.16s ease;}
@@ -284,7 +290,7 @@ textarea.form-input{resize:vertical;min-height:72px;}
     <div class="nav-item" onclick="nav('kiosk')"><span class="ni">🖥</span> Kiosk <span class="nav-badge" id="nb-kiosk">0</span></div>
     <div class="nav-item" onclick="nav('equipment')"><span class="ni">⚙</span> Equipment <span class="nav-badge" id="nb-equipment">0</span></div>
     <div class="nav-section">Commerciale</div>
-    <div class="nav-item" onclick="nav('ordini')"><span class="ni">📋</span> Ordini <span class="nav-badge" id="nb-ordini">0</span></div>
+    <div class="nav-item" onclick="nav('progetti')"><span class="ni">📋</span> Progetti <span class="nav-badge" id="nb-progetti">0</span></div>
     <div class="nav-section">Strumenti</div>
     <div class="nav-item" onclick="nav('confronto')"><span class="ni">⇄</span> Confronto HW</div>
     <div class="nav-item" onclick="nav('ricerca')"><span class="ni">🔍</span> Ricerca</div>
@@ -335,19 +341,19 @@ textarea.form-input{resize:vertical;min-height:72px;}
     <!-- KIOSK -->
     <div class="section" id="sec-kiosk">
       <div class="sec-header"><div><h2>Kiosk</h2><p>Catalogo modelli — ogni kiosk ha più Equipment associati</p></div><button class="btn btn-primary" onclick="openM('m-kiosk')">＋ Nuovo Kiosk</button></div>
-      <div class="table-card"><table><thead><tr><th>Modello</th><th>Versione</th><th>Seriale</th><th>Equipment</th><th>Garanzia</th><th>Assistenza</th><th>Foto</th><th>Azioni</th></tr></thead><tbody id="tb-kiosk"></tbody></table></div>
+      <div class="table-card"><table><thead><tr><th>Modello</th><th>Versione</th><th>Equipment</th><th>Note</th><th>Azioni</th></tr></thead><tbody id="tb-kiosk"></tbody></table></div>
     </div>
 
     <!-- EQUIPMENT -->
     <div class="section" id="sec-equipment">
       <div class="sec-header"><div><h2>Equipment</h2><p>Componenti hardware — ogni componente può avere più fornitori</p></div><button class="btn btn-primary" onclick="openM('m-equipment')">＋ Nuovo Equipment</button></div>
       <div class="filter-bar" id="eq-filter-bar"><button class="chip active" onclick="filterEq('tutti',this)">Tutti</button></div>
-      <div class="table-card"><table><thead><tr><th>Tipologia</th><th>Device</th><th>Dettaglio</th><th>Variante</th><th>Accessori</th><th>Fornitori</th><th>Azioni</th></tr></thead><tbody id="tb-equipment"></tbody></table></div>
+      <div class="table-card"><table><thead><tr><th>Tipologia</th><th>Codice</th><th>Dettaglio</th><th>Variante</th><th>Accessori</th><th>Fornitori</th><th>Azioni</th></tr></thead><tbody id="tb-equipment"></tbody></table></div>
     </div>
 
-    <!-- ORDINI -->
-    <div class="section" id="sec-ordini">
-      <div class="sec-header"><div><h2>Ordini</h2><p>Gestione ordini e progetti commerciali</p></div><button class="btn btn-primary" onclick="openM('m-ordine')">＋ Nuovo Ordine</button></div>
+    <!-- PROGETTI -->
+    <div class="section" id="sec-progetti">
+      <div class="sec-header"><div><h2>Progetti</h2><p>Gestione progetti e ordini commerciali</p></div><button class="btn btn-primary" onclick="openM('m-ordine')">＋ Nuovo Progetto</button></div>
       <div class="filter-bar">
         <button class="chip active" onclick="filterOrd('tutti',this)">Tutti</button>
         <button class="chip" onclick="filterOrd('in corso',this)">In Corso</button>
@@ -361,7 +367,7 @@ textarea.form-input{resize:vertical;min-height:72px;}
         <button class="btn btn-ghost btn-sm" onclick="clearDateFilter()">✕ Azzera</button>
         <span id="ord-count" style="margin-left:auto;font-size:11px;color:var(--gray-dk);font-family:var(--mono)"></span>
       </div>
-      <div class="table-card"><table><thead><tr><th>Codice</th><th>Cliente</th><th>Kiosk</th><th>Data Ordine</th><th>Consegna</th><th>Qtà</th><th>Costo Tot.</th><th>Stato</th><th>Azioni</th></tr></thead><tbody id="tb-ordini"></tbody></table></div>
+      <div class="table-card"><table><thead><tr><th>Codice</th><th>Cliente</th><th>Kiosk</th><th>Data Ordine</th><th>Consegna</th><th>Qtà</th><th>Costo Tot.</th><th>Garanzia</th><th>Assistenza</th><th>Stato</th><th>Azioni</th></tr></thead><tbody id="tb-ordini"></tbody></table></div>
     </div>
 
     <!-- CONFRONTO -->
@@ -447,7 +453,7 @@ textarea.form-input{resize:vertical;min-height:72px;}
 </div>
 
 <div class="modal-overlay" id="m-kiosk">
-  <div class="modal modal-xl">
+  <div class="modal modal-lg">
     <div class="modal-header"><h3 id="t-kiosk">Nuovo Kiosk</h3><button class="modal-close" onclick="closeM('m-kiosk')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="k-id">
@@ -456,36 +462,6 @@ textarea.form-input{resize:vertical;min-height:72px;}
         <div class="form-group"><label class="form-label">Versione</label><input class="form-input" id="k-versione" placeholder="Es. v2.1"></div>
       </div>
       <div class="form-group"><label class="form-label">Note</label><textarea class="form-input" id="k-note" placeholder="Descrizione, specifiche generali, contesto d'uso..."></textarea></div>
-
-      <div class="form-divider">🔢 Numero Seriale</div>
-      <div class="form-group"><label class="form-label">Numero Seriale</label><input class="form-input" id="k-seriale" placeholder="Es. SK2025-A1B2C3"></div>
-
-      <div class="form-divider">🛡 Garanzia</div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Garanzia Inclusa</label>
-          <select class="form-input" id="k-garanzia-si"><option value="no">No</option><option value="si">Sì</option></select>
-        </div>
-        <div class="form-group"><label class="form-label">Scadenza Garanzia</label><input class="form-input" type="date" id="k-garanzia-fine"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Note Garanzia</label><input class="form-input" id="k-garanzia-note" placeholder="Es. Garanzia produttore 2 anni, solo parti"></div>
-      <div class="form-divider" style="color:var(--gray-dk);font-size:9px">Estensioni Garanzia</div>
-      <p style="font-size:11px;color:var(--gray-dk);margin-bottom:8px">Registra eventuali estensioni di garanzia richieste dal cliente.</p>
-      <div id="k-gar-ext-list" style="margin-bottom:8px"></div>
-      <button class="btn btn-ghost btn-sm" onclick="addGaranziaExt()">＋ Aggiungi estensione</button>
-
-      <div class="form-divider">🔧 Assistenza</div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Assistenza Inclusa</label>
-          <select class="form-input" id="k-assist-si"><option value="no">No</option><option value="si">Sì</option></select>
-        </div>
-        <div class="form-group"><label class="form-label">Scadenza Assistenza</label><input class="form-input" type="date" id="k-assist-fine"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Note Assistenza</label><input class="form-input" id="k-assist-note" placeholder="Es. On-site entro 48h, remota illimitata"></div>
-      <div class="form-divider" style="color:var(--gray-dk);font-size:9px">Estensioni Assistenza</div>
-      <p style="font-size:11px;color:var(--gray-dk);margin-bottom:8px">Registra eventuali estensioni di assistenza richieste dal cliente.</p>
-      <div id="k-ass-ext-list" style="margin-bottom:8px"></div>
-      <button class="btn btn-ghost btn-sm" onclick="addAssistenzaExt()">＋ Aggiungi estensione</button>
-
       <div class="form-divider">Equipment Associati</div>
       <p style="font-size:11px;color:var(--gray-dk);margin-bottom:10px">Seleziona i componenti hardware di questo kiosk.</p>
       <div id="k-eq-list" style="margin-bottom:10px"></div>
@@ -493,14 +469,6 @@ textarea.form-input{resize:vertical;min-height:72px;}
         <select class="form-input" id="k-eq-sel"><option value="">— Seleziona Equipment da aggiungere —</option></select>
         <button class="btn btn-blue" onclick="addKioskEq()">＋ Aggiungi</button>
       </div>
-      <div class="form-divider">Galleria Foto</div>
-      <div class="drop-zone" id="k-drop-zone" ondragover="dragOver(event,'k-drop-zone')" ondragleave="dragLeave('k-drop-zone')" ondrop="photoDrop(event)">
-        <input type="file" id="k-photo-input" accept="image/*" multiple onchange="photoFiles(this.files)">
-        <div class="drop-icon">📷</div>
-        <div class="drop-text">Trascina le foto qui oppure <strong>clicca per scegliere</strong></div>
-        <div class="drop-text" style="margin-top:3px;font-size:10px">PNG, JPG, WEBP — illimitate</div>
-      </div>
-      <div class="photo-grid-modal" id="k-photo-preview"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeM('m-kiosk')">Annulla</button><button class="btn btn-primary" onclick="saveKiosk()">Salva</button></div>
   </div>
@@ -513,9 +481,9 @@ textarea.form-input{resize:vertical;min-height:72px;}
       <input type="hidden" id="e-id">
       <div class="form-row">
         <div class="form-group"><label class="form-label">Tipologia <span class="req">*</span></label>
-          <select class="form-input" id="e-tipologia"><option>Display</option><option>Computer</option><option>Stampante</option><option>Lettore</option><option>Telecamera</option><option>Tastiera</option><option>Alimentatore</option><option>Altro</option></select>
+          <select class="form-input" id="e-tipologia"><option>Display</option><option>PC</option><option>Stampante</option><option>Lettore</option><option>Telecamera</option><option>Tastiera</option><option>Alimentatore</option><option>Altro</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Device <span class="req">*</span></label><input class="form-input" id="e-device" placeholder="Es. Samsung OM55N, Intel NUC13"></div>
+        <div class="form-group"><label class="form-label">Codice <span class="req">*</span></label><input class="form-input" id="e-device" placeholder="Es. Samsung OM55N, Intel NUC13"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Dettaglio</label><input class="form-input" id="e-dettaglio" placeholder="Es. 55&quot; 4K UHD 500nit"></div>
@@ -523,12 +491,24 @@ textarea.form-input{resize:vertical;min-height:72px;}
       </div>
       <div class="form-group"><label class="form-label">Accessori</label><input class="form-input" id="e-accessori" placeholder="Es. Cavo HDMI, Staffa VESA"></div>
       <div class="form-divider">Fornitori Associati</div>
-      <p style="font-size:11px;color:var(--gray-dk);margin-bottom:10px">Un equipment può avere più fornitori alternativi.</p>
+      <p style="font-size:11px;color:var(--gray-dk);margin-bottom:10px">Seleziona fornitore esistente o creane uno nuovo direttamente.</p>
       <div id="e-forn-list" style="margin-bottom:10px"></div>
-      <div class="form-row" style="margin-bottom:0">
+      <div class="form-row" style="margin-bottom:8px">
         <select class="form-input" id="e-forn-sel"><option value="">— Seleziona Fornitore —</option></select>
         <button class="btn btn-blue" onclick="addEqFornitore()">＋ Aggiungi</button>
       </div>
+      <div id="eq-inline-forn" style="display:none;background:var(--gray);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:10px">Nuovo Fornitore</div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0"><label class="form-label">Azienda *</label><input class="form-input" id="eq-forn-azienda" placeholder="Ragione sociale"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Settore</label><input class="form-input" id="eq-forn-settore" placeholder="Es. Display, Stampanti"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-primary btn-sm" onclick="saveInlineForn()">Salva e aggiungi</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('eq-inline-forn').style.display='none';document.getElementById('eq-forn-azienda').value='';document.getElementById('eq-forn-settore').value=''">Annulla</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('eq-inline-forn').style.display=document.getElementById('eq-inline-forn').style.display==='none'?'block':'none'">＋ Crea nuovo fornitore</button>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeM('m-equipment')">Annulla</button><button class="btn btn-primary" onclick="saveEquipment()">Salva</button></div>
   </div>
@@ -536,12 +516,34 @@ textarea.form-input{resize:vertical;min-height:72px;}
 
 <div class="modal-overlay" id="m-ordine">
   <div class="modal modal-xl">
-    <div class="modal-header"><h3 id="t-ordine">Nuovo Ordine</h3><button class="modal-close" onclick="closeM('m-ordine')">✕</button></div>
+    <div class="modal-header"><h3 id="t-ordine">Nuovo Progetto</h3><button class="modal-close" onclick="closeM('m-ordine')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="o-id">
       <div class="form-row">
         <div class="form-group"><label class="form-label">Codice Progetto <span class="req">*</span></label><input class="form-input" id="o-codice" placeholder="Es. PRJ-2025-001"></div>
-        <div class="form-group"><label class="form-label">Cliente <span class="req">*</span></label><select class="form-input" id="o-cliente"><option value="">— Seleziona —</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Cliente <span class="req">*</span></label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="form-input" id="o-cliente" style="flex:1"><option value="">— Seleziona —</option></select>
+            <button class="btn btn-ghost btn-sm" style="flex-shrink:0;white-space:nowrap" onclick="document.getElementById('ord-inline-cliente').style.display=document.getElementById('ord-inline-cliente').style.display==='none'?'block':'none'">＋ Nuovo</button>
+          </div>
+        </div>
+      </div>
+      <!-- Inline nuovo cliente -->
+      <div id="ord-inline-cliente" style="display:none;background:var(--gray);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:10px">Nuovo Cliente</div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0"><label class="form-label">Azienda *</label><input class="form-input" id="ord-cl-azienda" placeholder="Ragione sociale"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Sede</label><input class="form-input" id="ord-cl-sede" placeholder="Città / Indirizzo"></div>
+        </div>
+        <div class="form-row" style="margin-top:8px">
+          <div class="form-group" style="margin:0"><label class="form-label">Settore</label><input class="form-input" id="ord-cl-settore" placeholder="Es. Retail, Banking"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Tipologia</label><select class="form-input" id="ord-cl-tipo"><option>Enterprise</option><option>PMI</option><option>Pubblica Amministrazione</option><option>Altro</option></select></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-primary btn-sm" onclick="saveInlineCliente()">Salva e seleziona</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ord-inline-cliente').style.display='none'">Annulla</button>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Data Ordine</label><input class="form-input" type="date" id="o-data-ordine"></div>
@@ -562,6 +564,26 @@ textarea.form-input{resize:vertical;min-height:72px;}
           <select class="form-input" id="o-stato"><option value="in corso">In Corso</option><option value="consegnato">Consegnato</option><option value="annullato">Annullato</option></select>
         </div>
       </div>
+      <div class="form-divider">🔢 Seriali per Unità</div>
+      <p style="font-size:11px;color:var(--gray-dk);margin-bottom:10px">Inserisci un numero seriale per ogni kiosk fisico dell'ordine.</p>
+      <div id="o-seriali-list" style="margin-bottom:8px"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addSerialeUnit()">＋ Aggiungi seriale unità</button>
+      <div class="form-divider">🛡 Garanzia</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Garanzia Inclusa</label>
+          <select class="form-input" id="o-garanzia-si"><option value="no">No</option><option value="si">Sì</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Scadenza Garanzia</label><input class="form-input" type="date" id="o-garanzia-fine"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Note Garanzia</label><input class="form-input" id="o-garanzia-note" placeholder="Es. Garanzia produttore 2 anni, solo parti"></div>
+      <div class="form-divider">🔧 Assistenza</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Assistenza Inclusa</label>
+          <select class="form-input" id="o-assist-si"><option value="no">No</option><option value="si">Sì</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Scadenza Assistenza</label><input class="form-input" type="date" id="o-assist-fine"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Note Assistenza</label><input class="form-input" id="o-assist-note" placeholder="Es. On-site entro 48h, remota illimitata"></div>
       <div class="form-group"><label class="form-label">Note Generali</label><textarea class="form-input" id="o-note" placeholder="Note aggiuntive..."></textarea></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeM('m-ordine')">Annulla</button><button class="btn btn-primary" onclick="saveOrdine()">Salva</button></div>
@@ -581,32 +603,9 @@ textarea.form-input{resize:vertical;min-height:72px;}
     <div class="modal-body">
       <input type="hidden" id="int-ordine-id">
       <input type="hidden" id="int-id">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Data Intervento <span class="req">*</span></label><input class="form-input" type="date" id="int-data"></div>
-        <div class="form-group"><label class="form-label">Tipo</label>
-          <select class="form-input" id="int-tipo">
-            <option value="manutenzione">🔧 Manutenzione</option>
-            <option value="riparazione">🛠 Riparazione</option>
-            <option value="aggiornamento">⬆ Aggiornamento SW/HW</option>
-            <option value="sostituzione">🔄 Sostituzione componente</option>
-            <option value="ispezione">🔍 Ispezione / Verifica</option>
-            <option value="altro">📝 Altro</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group"><label class="form-label">Descrizione <span class="req">*</span></label><textarea class="form-input" id="int-desc" placeholder="Descrivi l'intervento effettuato..."></textarea></div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Tecnico / Operatore</label><input class="form-input" id="int-tecnico" placeholder="Nome del tecnico"></div>
-        <div class="form-group"><label class="form-label">Esito</label>
-          <select class="form-input" id="int-esito">
-            <option value="risolto">✅ Risolto</option>
-            <option value="parziale">⚠ Parzialmente risolto</option>
-            <option value="in attesa">⏳ In attesa ricambi</option>
-            <option value="aperto">🔴 Aperto</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group"><label class="form-label">Note aggiuntive</label><input class="form-input" id="int-note" placeholder="Parti sostituite, costi, riferimenti ticket..."></div>
+      <div class="form-group"><label class="form-label">Data Intervento <span class="req">*</span></label><input class="form-input" type="date" id="int-data"></div>
+      <div class="form-group"><label class="form-label">Note <span class="req">*</span></label><textarea class="form-input" id="int-desc" placeholder="Descrivi l'intervento effettuato..." style="min-height:100px"></textarea></div>
+      <div class="form-group"><label class="form-label">Identificativo Totem</label><input class="form-input" id="int-totem" placeholder="Es. Seriale SK2025-001, Posizione Nord, Roma Centro"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeM('m-intervento')">Annulla</button><button class="btn btn-primary" onclick="saveIntervento()">Salva Intervento</button></div>
   </div>
@@ -651,7 +650,7 @@ function rerenderActiveSection(){
   if(id==='fornitori')renderFornitori();
   if(id==='kiosk')renderKiosk();
   if(id==='equipment'){buildEqBar();renderEquipment();}
-  if(id==='ordini')renderOrdini();
+  if(id==='ordini'||id==='progetti')renderOrdini();
   if(id==='confronto'){populateCmp();}
   refreshSel();
 }
@@ -686,7 +685,7 @@ function initFirebaseSync(){
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function log(a,d){db.activity.push({action:a,detail:d,ts:new Date().toLocaleString('it-IT')});if(db.activity.length>100)db.activity.shift();}
 
-const TITLES={dashboard:['Dashboard','Panoramica'],clienti:['Clienti','Anagrafica clienti'],fornitori:['Fornitori','Anagrafica fornitori'],kiosk:['Kiosk','Catalogo modelli'],equipment:['Equipment','Componenti hardware'],ordini:['Ordini','Gestione ordini'],confronto:['Confronto Hardware','Analisi comparativa'],ricerca:['Ricerca Avanzata','Cerca nel database']};
+const TITLES={dashboard:['Dashboard','Panoramica'],clienti:['Clienti','Anagrafica clienti'],fornitori:['Fornitori','Anagrafica fornitori'],kiosk:['Kiosk','Catalogo modelli'],equipment:['Equipment','Componenti hardware'],progetti:['Progetti','Gestione progetti e ordini'],confronto:['Confronto Hardware','Analisi comparativa'],ricerca:['Ricerca Avanzata','Cerca nel database']};
 
 function nav(s){
   document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
@@ -699,14 +698,14 @@ function nav(s){
   if(s==='fornitori')renderFornitori();
   if(s==='kiosk')renderKiosk();
   if(s==='equipment'){buildEqBar();renderEquipment();}
-  if(s==='ordini')renderOrdini();
+  if(s==='progetti')renderOrdini();
   if(s==='confronto')populateCmp();
   ['panel-kiosk','panel-cliente','panel-equipment','panel-ordine'].forEach(p=>closePanel(p));
 }
 
-function updateBadges(){['clienti','fornitori','kiosk','equipment','ordini'].forEach(k=>{const el=document.getElementById('nb-'+k);if(el)el.textContent=db[k].length;});}
+function updateBadges(){['clienti','fornitori','kiosk','equipment'].forEach(k=>{const el=document.getElementById('nb-'+k);if(el)el.textContent=db[k].length;});const el=document.getElementById('nb-progetti');if(el)el.textContent=db.ordini.length;}
 function updateDash(){
-  ['clienti','fornitori','kiosk','equipment','ordini'].forEach(k=>{const el=document.getElementById('d-'+k);if(el)el.textContent=db[k].length;});
+  ['clienti','fornitori','kiosk','equipment'].forEach(k=>{const el=document.getElementById('d-'+k);if(el)el.textContent=db[k].length;});const dp=document.getElementById('d-progetti');if(dp)dp.textContent=db.ordini.length;
   const el=document.getElementById('dash-activity');
   if(!db.activity.length){el.innerHTML='<div class="empty"><div class="empty-icon">◈</div><p>Nessuna attività ancora.<br>Inizia aggiungendo dati dal menu laterale.</p></div>';return;}
   const last=[...db.activity].reverse().slice(0,12);
@@ -742,13 +741,13 @@ function refreshSel(){
 }
 
 function clearForm(id){
-  const fmap={'m-cliente':['c-id','c-azienda','c-sede','c-settore','c-note'],'m-fornitore':['f-id','f-azienda','f-sede','f-settore','f-note'],'m-kiosk':['k-id','k-modello','k-versione','k-note','k-seriale','k-garanzia-note','k-assist-note'],'m-equipment':['e-id','e-device','e-dettaglio','e-variante','e-accessori'],'m-ordine':['o-id','o-codice','o-varianti','o-colore','o-note','o-qta','o-costo-unit','o-costo-tot'],'m-intervento':['int-ordine-id','int-id','int-tecnico','int-note','int-desc']};
+  const fmap={'m-cliente':['c-id','c-azienda','c-sede','c-settore','c-note'],'m-fornitore':['f-id','f-azienda','f-sede','f-settore','f-note'],'m-kiosk':['k-id','k-modello','k-versione','k-note'],'m-equipment':['e-id','e-device','e-dettaglio','e-variante','e-accessori'],'m-ordine':['o-id','o-codice','o-varianti','o-colore','o-note','o-qta','o-costo-unit','o-costo-tot','o-garanzia-note','o-assist-note'],'m-intervento':['int-ordine-id','int-id','int-desc','int-totem']};
   (fmap[id]||[]).forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
   if(id==='m-cliente'){document.getElementById('t-cliente').textContent='Nuovo Cliente';}
   if(id==='m-fornitore'){document.getElementById('t-fornitore').textContent='Nuovo Fornitore';}
-  if(id==='m-kiosk'){document.getElementById('t-kiosk').textContent='Nuovo Kiosk';pendingPhotos=[];renderPhotoPreview();document.getElementById('k-eq-list').innerHTML='';kioskEqP=[];document.getElementById('k-garanzia-si').value='no';document.getElementById('k-garanzia-fine').value='';document.getElementById('k-assist-si').value='no';document.getElementById('k-assist-fine').value='';document.getElementById('k-gar-ext-list').innerHTML='';document.getElementById('k-ass-ext-list').innerHTML='';kioskGarExt=[];kioskAssExt=[];}
+  if(id==='m-kiosk'){document.getElementById('t-kiosk').textContent='Nuovo Kiosk';document.getElementById('k-eq-list').innerHTML='';kioskEqP=[];}
   if(id==='m-equipment'){document.getElementById('t-equipment').textContent='Nuovo Equipment';document.getElementById('e-forn-list').innerHTML='';eqFornP=[];}
-  if(id==='m-ordine'){document.getElementById('t-ordine').textContent='Nuovo Ordine';['o-data-ordine','o-data-consegna'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});document.getElementById('o-stato').value='in corso';}
+  if(id==='m-ordine'){document.getElementById('t-ordine').textContent='Nuovo Progetto';['o-data-ordine','o-data-consegna','o-garanzia-fine','o-assist-fine'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});document.getElementById('o-stato').value='in corso';document.getElementById('o-garanzia-si').value='no';document.getElementById('o-assist-si').value='no';document.getElementById('o-seriali-list').innerHTML='';serialiUnita=[];document.getElementById('ord-inline-cliente').style.display='none';}
 }
 
 // CLIENTI
@@ -903,40 +902,23 @@ function deleteKioskPhoto(kioskId,i){const k=db.kiosk.find(x=>x.id===kioskId);if
 function saveKiosk(){
   const mod=document.getElementById('k-modello').value.trim();if(!mod){toast('Modello obbligatorio',true);return;}
   const id=document.getElementById('k-id').value;const existing=id?db.kiosk.find(x=>x.id===id):null;
-  const obj={id:id||uid(),modello:mod,versione:document.getElementById('k-versione').value,note:document.getElementById('k-note').value,equipmentIds:kioskEqP,photos:[...(existing?.photos||[]),...pendingPhotos],seriale:document.getElementById('k-seriale').value,garanziaIncl:document.getElementById('k-garanzia-si').value,garanziaFine:document.getElementById('k-garanzia-fine').value,garanziaNota:document.getElementById('k-garanzia-note').value,garanziaExt:kioskGarExt,assistIncl:document.getElementById('k-assist-si').value,assistFine:document.getElementById('k-assist-fine').value,assistNota:document.getElementById('k-assist-note').value,assistExt:kioskAssExt};
+  const obj={id:id||uid(),modello:mod,versione:document.getElementById('k-versione').value,note:document.getElementById('k-note').value,equipmentIds:kioskEqP};
   if(id){const i=db.kiosk.findIndex(x=>x.id===id);db.kiosk[i]=obj;log('Kiosk aggiornato',mod);}else{db.kiosk.push(obj);log('Kiosk aggiunto',mod);}
   saveDB();closeM('m-kiosk');renderKiosk();toast(id?'Kiosk aggiornato':'Kiosk aggiunto ✓');refreshSel();
 }
 function editKiosk(id){
   const k=db.kiosk.find(x=>x.id===id);if(!k)return;refreshSel();
   document.getElementById('k-id').value=k.id;document.getElementById('k-modello').value=k.modello;document.getElementById('k-versione').value=k.versione||'';document.getElementById('k-note').value=k.note||'';
-  document.getElementById('k-seriale').value=k.seriale||'';
-  document.getElementById('k-garanzia-si').value=k.garanziaIncl||'no';document.getElementById('k-garanzia-fine').value=k.garanziaFine||'';document.getElementById('k-garanzia-note').value=k.garanziaNota||'';
-  document.getElementById('k-assist-si').value=k.assistIncl||'no';document.getElementById('k-assist-fine').value=k.assistFine||'';document.getElementById('k-assist-note').value=k.assistNota||'';
-  kioskGarExt=[...(k.garanziaExt||[])];renderGarExtList();
-  kioskAssExt=[...(k.assistExt||[])];renderAssExtList();
-  kioskEqP=[...(k.equipmentIds||[])];renderKioskEqList();pendingPhotos=[];renderPhotoPreview();
+  kioskEqP=[...(k.equipmentIds||[])];renderKioskEqList();pendingPhotos=[];
   document.getElementById('t-kiosk').textContent='Modifica Kiosk';openM('m-kiosk');
 }
 function deleteKiosk(id){if(!confirm('Eliminare?'))return;const k=db.kiosk.find(x=>x.id===id);db.kiosk=db.kiosk.filter(x=>x.id!==id);log('Kiosk eliminato',k?.modello||'');saveDB();renderKiosk();toast('Eliminato',true);refreshSel();}
 function renderKiosk(){
   const tb=document.getElementById('tb-kiosk');
-  if(!db.kiosk.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">🖥</div><p>Nessun kiosk.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-kiosk\')">＋ Aggiungi</button></p></div></td></tr>';return;}
+  if(!db.kiosk.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">🖥</div><p>Nessun kiosk.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-kiosk\')">＋ Aggiungi</button></p></div></td></tr>';return;}
   tb.innerHTML=db.kiosk.map(k=>{
-    const nE=(k.equipmentIds||[]).length,nF=(k.photos||[]).length;
-    const gs=scadenzaStatus(k.garanziaIncl,k.garanziaFine);
-    const as=scadenzaStatus(k.assistIncl,k.assistFine);
-    const nGarExt=(k.garanziaExt||[]).length,nAssExt=(k.assistExt||[]).length;
-    return '<tr>'
-      +'<td><strong style="color:var(--blue)">'+k.modello+'</strong>'+(k.note?'<div style="font-size:10px;color:var(--gray-dk);margin-top:2px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+k.note+'</div>':'')+'</td>'
-      +'<td><span class="badge b-gray">'+(k.versione||'—')+'</span></td>'
-      +'<td>'+(k.seriale?'<span class="serial-badge">'+k.seriale+'</span>':'—')+'</td>'
-      +'<td>'+(nE?'<span class="badge b-green">'+nE+' comp.</span>':'—')+'</td>'
-      +'<td><span title="'+(k.garanziaFine||'')+'">'+gs.dot+' <span style="font-size:11px">'+gs.label+'</span>'+(nGarExt?'<span class="badge b-gray" style="margin-left:4px;font-size:9px">+'+nGarExt+' est.</span>':'')+(k.garanziaFine?'<div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono)">'+k.garanziaFine+'</div>':'')+'</span></td>'
-      +'<td><span title="'+(k.assistFine||'')+'">'+as.dot+' <span style="font-size:11px">'+as.label+'</span>'+(nAssExt?'<span class="badge b-gray" style="margin-left:4px;font-size:9px">+'+nAssExt+' est.</span>':'')+(k.assistFine?'<div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono)">'+k.assistFine+'</div>':'')+'</span></td>'
-      +'<td>'+(nF?'<span class="badge b-blue">📷 '+nF+'</span>':'—')+'</td>'
-      +'<td><div class="actions-cell"><button class="btn btn-ghost btn-xs" onclick="showKioskDetail(\''+k.id+'\')">▶ Dettaglio</button><button class="btn btn-ghost btn-xs" onclick="editKiosk(\''+k.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteKiosk(\''+k.id+'\')">✕</button></div></td>'
-      +'</tr>';
+    const nE=(k.equipmentIds||[]).length;
+    return '<tr><td><strong style="color:var(--blue)">'+k.modello+'</strong></td><td><span class="badge b-gray">'+(k.versione||'—')+'</span></td><td>'+(nE?'<span class="badge b-green">'+nE+' comp.</span>':'—')+'</td><td style="font-size:11px;color:var(--text-lt);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(k.note||'—')+'</td><td><div class="actions-cell"><button class="btn btn-ghost btn-xs" onclick="showKioskDetail(\''+k.id+'\')">▶ Dettaglio</button><button class="btn btn-ghost btn-xs" onclick="editKiosk(\''+k.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteKiosk(\''+k.id+'\')">✕</button></div></td></tr>';
   }).join('');
 }
 function showKioskDetail(id){
@@ -974,9 +956,38 @@ function showKioskDetail(id){
   document.getElementById('panel-kiosk').classList.add('open');
 }
 
-// ORDINI
+// PROGETTI (ex Ordini)
 let ordFilter='tutti';
+let serialiUnita=[];
 function calcTot(){const q=parseFloat(document.getElementById('o-qta').value)||0;const u=parseFloat(document.getElementById('o-costo-unit').value)||0;document.getElementById('o-costo-tot').value=(q*u).toFixed(2);}
+// Seriali per unità
+function addSerialeUnit(){serialiUnita.push({id:uid(),seriale:''});renderSerialiList();}
+function removeSerialeUnit(id){serialiUnita=serialiUnita.filter(x=>x.id!==id);renderSerialiList();}
+function renderSerialiList(){
+  const el=document.getElementById('o-seriali-list');if(!el)return;
+  if(!serialiUnita.length){el.innerHTML='';return;}
+  el.innerHTML=serialiUnita.map((s,i)=>'<div class="eq-row" style="margin-bottom:6px"><span class="eq-tipo">Unità '+(i+1)+'</span><input class="form-input" style="flex:1;padding:5px 9px;font-size:12px" placeholder="Numero seriale..." value="'+(s.seriale||'')+'" oninput="serialiUnita['+i+'].seriale=this.value"></input><button class="btn btn-danger btn-xs" onclick="removeSerialeUnit(\''+s.id+'\')">✕</button></div>').join('');
+}
+// Inline cliente
+function saveInlineCliente(){
+  const az=document.getElementById('ord-cl-azienda').value.trim();if(!az){toast('Azienda obbligatoria',true);return;}
+  const obj={id:uid(),azienda:az,sede:document.getElementById('ord-cl-sede').value,settore:document.getElementById('ord-cl-settore').value,tipologia:document.getElementById('ord-cl-tipo').value,note:''};
+  db.clienti.push(obj);log('Cliente aggiunto (inline)',az);saveDB();
+  const sel=document.getElementById('o-cliente');const opt=document.createElement('option');opt.value=obj.id;opt.textContent=obj.azienda;sel.appendChild(opt);sel.value=obj.id;
+  document.getElementById('ord-inline-cliente').style.display='none';
+  document.getElementById('ord-cl-azienda').value='';document.getElementById('ord-cl-sede').value='';document.getElementById('ord-cl-settore').value='';
+  toast('Cliente creato e selezionato ✓');
+}
+// Inline fornitore (in equipment)
+function saveInlineForn(){
+  const az=document.getElementById('eq-forn-azienda').value.trim();if(!az){toast('Azienda obbligatoria',true);return;}
+  const obj={id:uid(),azienda:az,sede:'',settore:document.getElementById('eq-forn-settore').value,tipologia:'Produttore',note:''};
+  db.fornitori.push(obj);log('Fornitore aggiunto (inline)',az);saveDB();
+  const sel=document.getElementById('e-forn-sel');const opt=document.createElement('option');opt.value=obj.id;opt.textContent=obj.azienda;sel.appendChild(opt);sel.value=obj.id;
+  addEqFornitore();
+  document.getElementById('eq-inline-forn').style.display='none';document.getElementById('eq-forn-azienda').value='';document.getElementById('eq-forn-settore').value='';
+  toast('Fornitore creato e aggiunto ✓');
+}
 function saveOrdine(){
   const cod=document.getElementById('o-codice').value.trim(),clId=document.getElementById('o-cliente').value;
   if(!cod||!clId){toast('Codice e cliente obbligatori',true);return;}
@@ -984,29 +995,23 @@ function saveOrdine(){
   const qta=parseInt(document.getElementById('o-qta').value)||1;
   const cu=parseFloat(document.getElementById('o-costo-unit').value)||0;
   const existing=id?db.ordini.find(x=>x.id===id):null;
-  const obj={id:id||uid(),codice:cod,clienteId:clId,kioskId:document.getElementById('o-kiosk').value,dataOrdine:document.getElementById('o-data-ordine').value,dataConsegna:document.getElementById('o-data-consegna').value,qta,costoUnit:cu,costoTot:(qta*cu).toFixed(2),varianti:document.getElementById('o-varianti').value,colore:document.getElementById('o-colore').value,stato:document.getElementById('o-stato').value,note:document.getElementById('o-note').value,interventi:existing?.interventi||[],createdAt:existing?.createdAt||new Date().toISOString()};
-  if(id){const i=db.ordini.findIndex(x=>x.id===id);db.ordini[i]=obj;log('Ordine aggiornato',cod);}else{db.ordini.push(obj);log('Ordine aggiunto',cod);}
-  saveDB();closeM('m-ordine');renderOrdini();toast(id?'Ordine aggiornato':'Ordine aggiunto ✓');
+  const obj={id:id||uid(),codice:cod,clienteId:clId,kioskId:document.getElementById('o-kiosk').value,dataOrdine:document.getElementById('o-data-ordine').value,dataConsegna:document.getElementById('o-data-consegna').value,qta,costoUnit:cu,costoTot:(qta*cu).toFixed(2),varianti:document.getElementById('o-varianti').value,colore:document.getElementById('o-colore').value,stato:document.getElementById('o-stato').value,note:document.getElementById('o-note').value,seriali:serialiUnita,garanziaIncl:document.getElementById('o-garanzia-si').value,garanziaFine:document.getElementById('o-garanzia-fine').value,garanziaNota:document.getElementById('o-garanzia-note').value,assistIncl:document.getElementById('o-assist-si').value,assistFine:document.getElementById('o-assist-fine').value,assistNota:document.getElementById('o-assist-note').value,interventi:existing?.interventi||[],createdAt:existing?.createdAt||new Date().toISOString()};
+  if(id){const i=db.ordini.findIndex(x=>x.id===id);db.ordini[i]=obj;log('Progetto aggiornato',cod);}else{db.ordini.push(obj);log('Progetto aggiunto',cod);}
+  saveDB();closeM('m-ordine');renderOrdini();toast(id?'Progetto aggiornato':'Progetto aggiunto ✓');
 }
 function editOrdine(id){
   const o=db.ordini.find(x=>x.id===id);if(!o)return;refreshSel();
-  document.getElementById('o-id').value=o.id;
-  document.getElementById('o-codice').value=o.codice;
-  document.getElementById('o-cliente').value=o.clienteId;
-  document.getElementById('o-kiosk').value=o.kioskId||'';
-  document.getElementById('o-data-ordine').value=o.dataOrdine||'';
-  document.getElementById('o-data-consegna').value=o.dataConsegna||'';
-  document.getElementById('o-qta').value=o.qta||1;
-  document.getElementById('o-costo-unit').value=o.costoUnit||0;
-  document.getElementById('o-costo-tot').value=o.costoTot||0;
-  document.getElementById('o-varianti').value=o.varianti||'';
-  document.getElementById('o-colore').value=o.colore||'';
-  document.getElementById('o-stato').value=o.stato||'in corso';
-  document.getElementById('o-note').value=o.note||'';
-  document.getElementById('t-ordine').textContent='Modifica Ordine';openM('m-ordine');
+  document.getElementById('o-id').value=o.id;document.getElementById('o-codice').value=o.codice;document.getElementById('o-cliente').value=o.clienteId;document.getElementById('o-kiosk').value=o.kioskId||'';
+  document.getElementById('o-data-ordine').value=o.dataOrdine||'';document.getElementById('o-data-consegna').value=o.dataConsegna||'';
+  document.getElementById('o-qta').value=o.qta||1;document.getElementById('o-costo-unit').value=o.costoUnit||0;document.getElementById('o-costo-tot').value=o.costoTot||0;
+  document.getElementById('o-varianti').value=o.varianti||'';document.getElementById('o-colore').value=o.colore||'';document.getElementById('o-stato').value=o.stato||'in corso';document.getElementById('o-note').value=o.note||'';
+  document.getElementById('o-garanzia-si').value=o.garanziaIncl||'no';document.getElementById('o-garanzia-fine').value=o.garanziaFine||'';document.getElementById('o-garanzia-note').value=o.garanziaNota||'';
+  document.getElementById('o-assist-si').value=o.assistIncl||'no';document.getElementById('o-assist-fine').value=o.assistFine||'';document.getElementById('o-assist-note').value=o.assistNota||'';
+  serialiUnita=[...(o.seriali||[])];renderSerialiList();
+  document.getElementById('t-ordine').textContent='Modifica Progetto';openM('m-ordine');
 }
-function deleteOrdine(id){if(!confirm('Eliminare?'))return;const o=db.ordini.find(x=>x.id===id);db.ordini=db.ordini.filter(x=>x.id!==id);log('Ordine eliminato',o?.codice||'');saveDB();renderOrdini();toast('Eliminato',true);}
-function filterOrd(f,btn){ordFilter=f;document.querySelectorAll('#sec-ordini .filter-bar .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderOrdini();}
+function deleteOrdine(id){if(!confirm('Eliminare?'))return;const o=db.ordini.find(x=>x.id===id);db.ordini=db.ordini.filter(x=>x.id!==id);log('Progetto eliminato',o?.codice||'');saveDB();renderOrdini();toast('Eliminato',true);}
+function filterOrd(f,btn){ordFilter=f;document.querySelectorAll('#sec-progetti .filter-bar .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderOrdini();}
 function clearDateFilter(){document.getElementById('ord-dal').value='';document.getElementById('ord-al').value='';renderOrdini();}
 function scadenzaStatus(incl,fine){
   if(incl!=='si')return{cls:'none',label:'No',dot:'⚪'};
@@ -1023,25 +1028,28 @@ function renderOrdini(){
   if(dal)data=data.filter(o=>(o.dataOrdine||'')>=dal);
   if(al)data=data.filter(o=>(o.dataOrdine||'')<=al);
   data=[...data].sort((a,b)=>(b.dataOrdine||b.createdAt||'').localeCompare(a.dataOrdine||a.createdAt||''));
-  const cnt=document.getElementById('ord-count');if(cnt)cnt.textContent=data.length?data.length+' ordini':'';
+  const cnt=document.getElementById('ord-count');if(cnt)cnt.textContent=data.length?data.length+' progetti':'';
   const tb=document.getElementById('tb-ordini');
-  if(!data.length){tb.innerHTML='<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div><p>Nessun ordine trovato.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-ordine\')">＋ Aggiungi</button></p></div></td></tr>';return;}
+  if(!data.length){tb.innerHTML='<tr><td colspan="11"><div class="empty"><div class="empty-icon">📋</div><p>Nessun progetto trovato.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-ordine\')">＋ Aggiungi</button></p></div></td></tr>';return;}
   const sb={consegnato:'b-green',annullato:'b-red','in corso':'b-warn'};
   tb.innerHTML=data.map(o=>{
     const cl=db.clienti.find(c=>c.id===o.clienteId),k=db.kiosk.find(x=>x.id===o.kioskId);
     const nInt=(o.interventi||[]).length;
+    const nSer=(o.seriali||[]).filter(s=>s.seriale).length;
+    const gs=scadenzaStatus(o.garanziaIncl,o.garanziaFine);
+    const as=scadenzaStatus(o.assistIncl,o.assistFine);
     return '<tr>'
-      +'<td><span style="font-family:var(--mono);font-size:11px;color:var(--blue);font-weight:600">'+o.codice+'</span></td>'
+      +'<td><span style="font-family:var(--mono);font-size:11px;color:var(--blue);font-weight:600">'+o.codice+'</span>'+(nSer?'<div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono);margin-top:2px">'+nSer+' serial</div>':'')+'</td>'
       +'<td>'+(cl?'<strong>'+cl.azienda+'</strong>':'—')+'</td>'
       +'<td>'+(k?'<span class="badge b-blue">'+k.modello+'</span>':'—')+'</td>'
       +'<td style="font-family:var(--mono);font-size:11px">'+(o.dataOrdine||'—')+'</td>'
       +'<td style="font-family:var(--mono);font-size:11px">'+(o.dataConsegna||'—')+'</td>'
       +'<td style="text-align:center">'+(o.qta||1)+'</td>'
       +'<td style="font-family:var(--mono);font-weight:600;color:var(--blue-md)">€ '+(o.costoTot||'0.00')+'</td>'
+      +'<td>'+gs.dot+' <span style="font-size:11px">'+gs.label+'</span>'+(o.garanziaFine?'<div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono)">'+o.garanziaFine+'</div>':'')+'</td>'
+      +'<td>'+as.dot+' <span style="font-size:11px">'+as.label+'</span>'+(o.assistFine?'<div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono)">'+o.assistFine+'</div>':'')+'</td>'
       +'<td><span class="badge '+(sb[o.stato]||'b-gray')+'">'+o.stato+'</span></td>'
-      +'<td><span title="'+(o.garanziaFine||'')+'">'+gs.dot+' '+gs.label+(o.garanziaFine?'<div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono)">'+o.garanziaFine+'</div>':'')+'</span></td>'
-      +'<td><span title="'+(o.assistFine||'')+'">'+as.dot+' '+as.label+(o.assistFine?'<div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono)">'+o.assistFine+'</div>':'')+'</span></td>'
-      +'<td><div class="actions-cell"><button class="btn btn-ghost btn-xs" onclick="showOrdineDetail(\''+o.id+'\')">▶'+(nInt?' <span style=\'color:var(--warn)\'>'+nInt+'</span>':'')+'</button><button class="btn btn-ghost btn-xs" onclick="editOrdine(\''+o.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteOrdine(\''+o.id+'\')">✕</button></div></td>'
+      +'<td><div class="actions-cell"><button class="btn btn-ghost btn-xs" onclick="showOrdineDetail(\''+o.id+'\')" title="Dettaglio">▶'+(nInt?' <span style="color:var(--warn);font-weight:700">'+nInt+'</span>':'')+'</button><button class="btn btn-ghost btn-xs" onclick="editOrdine(\''+o.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteOrdine(\''+o.id+'\')">✕</button></div></td>'
       +'</tr>';
   }).join('');
 }
@@ -1129,9 +1137,9 @@ function openNewIntervento(ordineId){
   document.getElementById('int-ordine-id').value=ordineId;
   document.getElementById('int-id').value='';
   document.getElementById('int-data').value=new Date().toISOString().slice(0,10);
-  document.getElementById('int-tipo').value='manutenzione';
-  document.getElementById('int-esito').value='risolto';
-  document.getElementById('t-intervento').textContent='Nuovo Intervento';
+  document.getElementById('int-desc').value='';
+  document.getElementById('int-totem').value='';
+  document.getElementById('t-intervento').textContent='Nuovo Intervento di Assistenza';
   document.getElementById('m-intervento').classList.add('open');
 }
 function editIntervento(ordineId,intId){
@@ -1140,11 +1148,8 @@ function editIntervento(ordineId,intId){
   document.getElementById('int-ordine-id').value=ordineId;
   document.getElementById('int-id').value=intId;
   document.getElementById('int-data').value=iv.data||'';
-  document.getElementById('int-tipo').value=iv.tipo||'manutenzione';
   document.getElementById('int-desc').value=iv.desc||'';
-  document.getElementById('int-tecnico').value=iv.tecnico||'';
-  document.getElementById('int-esito').value=iv.esito||'risolto';
-  document.getElementById('int-note').value=iv.note||'';
+  document.getElementById('int-totem').value=iv.totem||'';
   document.getElementById('t-intervento').textContent='Modifica Intervento';
   document.getElementById('m-intervento').classList.add('open');
 }
@@ -1152,11 +1157,11 @@ function saveIntervento(){
   const ordineId=document.getElementById('int-ordine-id').value;
   const data=document.getElementById('int-data').value;
   const desc=document.getElementById('int-desc').value.trim();
-  if(!data||!desc){toast('Data e descrizione obbligatorie',true);return;}
+  if(!data||!desc){toast('Data e note obbligatorie',true);return;}
   const o=db.ordini.find(x=>x.id===ordineId);if(!o)return;
   if(!o.interventi)o.interventi=[];
   const intId=document.getElementById('int-id').value;
-  const iv={id:intId||uid(),data,tipo:document.getElementById('int-tipo').value,desc,tecnico:document.getElementById('int-tecnico').value,esito:document.getElementById('int-esito').value,note:document.getElementById('int-note').value};
+  const iv={id:intId||uid(),data,desc,totem:document.getElementById('int-totem').value};
   if(intId){const i=o.interventi.findIndex(x=>x.id===intId);o.interventi[i]=iv;log('Intervento aggiornato',o.codice);}
   else{o.interventi.push(iv);log('Intervento aggiunto',o.codice+' — '+data);}
   saveDB();closeM('m-intervento');showOrdineDetail(ordineId);toast(intId?'Intervento aggiornato':'Intervento salvato ✓');
@@ -1197,6 +1202,15 @@ function advSearch(q){
 
 // INIT
 loadDB();updateBadges();updateDash();refreshSel();
+
+// Registrazione Service Worker (PWA)
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js')
+      .then(()=>console.log('SW registrato ✓'))
+      .catch(e=>console.log('SW errore:',e));
+  });
+}
 window.addEventListener('firebase-ready',initFirebaseSync);
 // In case the module script already fired before this script ran
 if(window.__fb)initFirebaseSync();
