@@ -463,12 +463,30 @@ textarea.form-input{resize:vertical;min-height:72px;}
       </div>
       <div class="form-group"><label class="form-label">Note</label><textarea class="form-input" id="k-note" placeholder="Descrizione, specifiche generali, contesto d'uso..."></textarea></div>
       <div class="form-divider">Equipment Associati</div>
-      <p style="font-size:11px;color:var(--gray-dk);margin-bottom:10px">Seleziona i componenti hardware di questo kiosk.</p>
+      <p style="font-size:11px;color:var(--gray-dk);margin-bottom:10px">Seleziona equipment esistente o creane uno nuovo direttamente.</p>
       <div id="k-eq-list" style="margin-bottom:10px"></div>
-      <div class="form-row" style="margin-bottom:0">
+      <div class="form-row" style="margin-bottom:8px">
         <select class="form-input" id="k-eq-sel"><option value="">— Seleziona Equipment da aggiungere —</option></select>
         <button class="btn btn-blue" onclick="addKioskEq()">＋ Aggiungi</button>
       </div>
+      <div id="kiosk-inline-eq" style="display:none;background:var(--gray);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:10px">Nuovo Equipment</div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0"><label class="form-label">Tipologia *</label>
+            <select class="form-input" id="ki-eq-tipo"><option>Display</option><option>PC</option><option>Stampante</option><option>Lettore</option><option>Telecamera</option><option>Tastiera</option><option>Alimentatore</option><option>Altro</option></select>
+          </div>
+          <div class="form-group" style="margin:0"><label class="form-label">Codice *</label><input class="form-input" id="ki-eq-codice" placeholder="Es. Samsung OM55N"></div>
+        </div>
+        <div class="form-row" style="margin-top:8px">
+          <div class="form-group" style="margin:0"><label class="form-label">Dettaglio</label><input class="form-input" id="ki-eq-dettaglio" placeholder="Es. 55&quot; 4K UHD"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Variante</label><input class="form-input" id="ki-eq-variante" placeholder="Es. Touch / No Touch"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-primary btn-sm" onclick="saveInlineEquipment()">Salva e aggiungi</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('kiosk-inline-eq').style.display='none'">Annulla</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('kiosk-inline-eq').style.display=document.getElementById('kiosk-inline-eq').style.display==='none'?'block':'none'">＋ Crea nuovo equipment</button>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeM('m-kiosk')">Annulla</button><button class="btn btn-primary" onclick="saveKiosk()">Salva</button></div>
   </div>
@@ -978,6 +996,17 @@ function saveInlineCliente(){
   document.getElementById('ord-cl-azienda').value='';document.getElementById('ord-cl-sede').value='';document.getElementById('ord-cl-settore').value='';
   toast('Cliente creato e selezionato ✓');
 }
+// Inline equipment (dentro modale kiosk)
+function saveInlineEquipment(){
+  const cod=document.getElementById('ki-eq-codice').value.trim();
+  if(!cod){toast('Codice obbligatorio',true);return;}
+  const obj={id:uid(),tipologia:document.getElementById('ki-eq-tipo').value,device:cod,dettaglio:document.getElementById('ki-eq-dettaglio').value,variante:document.getElementById('ki-eq-variante').value,accessori:'',fornitoriIds:[]};
+  db.equipment.push(obj);log('Equipment aggiunto (inline)',cod);saveDB();
+  kioskEqP.push(obj.id);renderKioskEqList();refreshSel();
+  document.getElementById('kiosk-inline-eq').style.display='none';
+  document.getElementById('ki-eq-codice').value='';document.getElementById('ki-eq-dettaglio').value='';document.getElementById('ki-eq-variante').value='';
+  toast('Equipment creato e aggiunto ✓');
+}
 // Inline fornitore (in equipment)
 function saveInlineForn(){
   const az=document.getElementById('eq-forn-azienda').value.trim();if(!az){toast('Azienda obbligatoria',true);return;}
@@ -1091,43 +1120,47 @@ function showOrdineDetail(id){
   const o=db.ordini.find(x=>x.id===id);if(!o)return;
   const cl=db.clienti.find(c=>c.id===o.clienteId);
   const k=db.kiosk.find(x=>x.id===o.kioskId);
-  const k2=db.kiosk.find(x=>x.id===o.kioskId);
-  const gs=scadenzaStatus(k2?.garanziaIncl,k2?.garanziaFine);
-  const as=scadenzaStatus(k2?.assistIncl,k2?.assistFine);
-  const garExt2=k2?.garanziaExt||[];
-  const assExt2=k2?.assistExt||[];
-  const interventi=(o.interventi||[]).sort((a,b)=>b.data.localeCompare(a.data));
-  const tipoIcon={manutenzione:'🔧',riparazione:'🛠',aggiornamento:'⬆',sostituzione:'🔄',ispezione:'🔍',altro:'📝'};
-  const esitoStyle={risolto:'color:var(--green-dk)',parziale:'color:var(--warn)',in_attesa:'color:var(--warn)','in attesa':'color:var(--warn)',aperto:'color:var(--danger)'};
+  const gs=scadenzaStatus(o.garanziaIncl,o.garanziaFine);
+  const as=scadenzaStatus(o.assistIncl,o.assistFine);
+  const interventi=(o.interventi||[]).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  const seriali=o.seriali||[];
   document.getElementById('po-title').textContent=o.codice;
   document.getElementById('po-body').innerHTML=
-    // header info
     '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
-    +(k2&&k2.seriale?'<span class="serial-badge">🔢 '+k2.seriale+'</span>':'')
     +'<span class="badge '+(o.stato==='consegnato'?'b-green':o.stato==='annullato'?'b-red':'b-warn')+'">'+o.stato+'</span>'
     +(k?'<span class="badge b-blue">🖥 '+k.modello+'</span>':'')
     +(cl?'<span class="badge b-gray">👤 '+cl.azienda+'</span>':'')
     +'</div>'
-    // date
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">'
     +'<div style="background:var(--gray);border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 10px"><div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px">Data Ordine</div><div style="font-size:12px;font-weight:600;font-family:var(--mono)">'+(o.dataOrdine||'—')+'</div></div>'
     +'<div style="background:var(--gray);border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 10px"><div style="font-size:9px;color:var(--gray-dk);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px">Consegna</div><div style="font-size:12px;font-weight:600;font-family:var(--mono)">'+(o.dataConsegna||'—')+'</div></div>'
     +'</div>'
-    // garanzia + assistenza cards
-    +'<div class="panel-section-label" style="margin-top:0;padding-top:0;border-top:none">Garanzia &amp; Assistenza</div>'
+    // seriali unità
+    +(seriali.length?'<div class="panel-section-label" style="margin-top:0;padding-top:0;border-top:none">Seriali Unità ('+seriali.filter(s=>s.seriale).length+'/'+seriali.length+')</div>'
+    +seriali.map((s,i)=>'<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--gray);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px"><span style="font-size:10px;color:var(--gray-dk);width:52px">Unità '+(i+1)+'</span><span class="serial-badge" style="flex:1">'+(s.seriale||'— non inserito —')+'</span></div>').join(''):'')
+    // garanzia + assistenza dal progetto
+    +'<div class="panel-section-label"'+(seriali.length?'':' style="margin-top:0;padding-top:0;border-top:none"')+'>Garanzia &amp; Assistenza</div>'
     +'<div class="status-cards">'
-    +(k2?'<div class="status-card '+gs.cls+'"><div class="sc-label">🛡 Garanzia Kiosk</div><div class="sc-val '+gs.cls+'">'+gs.dot+' '+gs.label+'</div>'+(k2.garanziaFine?'<div class="sc-date">Scade: '+k2.garanziaFine+'</div>':'')+(k2.garanziaNota?'<div class="sc-date">'+k2.garanziaNota+'</div>':'')+(garExt2.length?'<div class="sc-date" style="color:var(--green-dk)">+'+garExt2.length+' estensione/i</div>':'')+'</div>':'<div class="status-card none"><div class="sc-label">🛡 Garanzia</div><div class="sc-val none">Nessun kiosk</div></div>')
-    +(k2?'<div class="status-card '+as.cls+'"><div class="sc-label">🔧 Assistenza Kiosk</div><div class="sc-val '+as.cls+'">'+as.dot+' '+as.label+'</div>'+(k2.assistFine?'<div class="sc-date">Scade: '+k2.assistFine+'</div>':'')+(k2.assistNota?'<div class="sc-date">'+k2.assistNota+'</div>':'')+(assExt2.length?'<div class="sc-date" style="color:var(--blue)">+'+assExt2.length+' estensione/i</div>':'')+'</div>':'<div class="status-card none"><div class="sc-label">🔧 Assistenza</div><div class="sc-val none">Nessun kiosk</div></div>')
+    +'<div class="status-card '+gs.cls+'"><div class="sc-label">🛡 Garanzia</div><div class="sc-val '+gs.cls+'">'+gs.dot+' '+gs.label+'</div>'+(o.garanziaFine?'<div class="sc-date">Scade: '+o.garanziaFine+'</div>':'')+(o.garanziaNota?'<div class="sc-date">'+o.garanziaNota+'</div>':'')+'</div>'
+    +'<div class="status-card '+as.cls+'"><div class="sc-label">🔧 Assistenza</div><div class="sc-val '+as.cls+'">'+as.dot+' '+as.label+'</div>'+(o.assistFine?'<div class="sc-date">Scade: '+o.assistFine+'</div>':'')+(o.assistNota?'<div class="sc-date">'+o.assistNota+'</div>':'')+'</div>'
     +'</div>'
-    +(k2?'<p style="font-size:10px;color:var(--gray-dk);margin-top:4px;margin-bottom:8px">Garanzia e assistenza riferite al Kiosk associato.</p>':'')
-    // varianti / colore / costo
     +(o.varianti||o.colore?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">'+(o.varianti?'<span class="badge b-gray">'+o.varianti+'</span>':'')+(o.colore?'<span class="badge b-gray">🎨 '+o.colore+'</span>':'')+'</div>':'')
     +'<div style="font-size:11px;color:var(--text-lt);margin-bottom:12px">Qtà: <strong>'+o.qta+'</strong> · Costo tot.: <strong style="color:var(--blue)">€ '+o.costoTot+'</strong></div>'
     +(o.note?'<p style="font-size:11px;color:var(--text-lt);margin-bottom:12px;line-height:1.5;background:var(--gray);padding:8px 10px;border-radius:var(--radius)">'+o.note+'</p>':'')
-    // interventi
-    +'<div class="panel-section-label" style="display:flex;align-items:center;justify-content:space-between"><span>Interventi ('+interventi.length+')</span><button class="btn btn-primary btn-xs" onclick="openNewIntervento(\''+id+'\')">＋ Aggiungi</button></div>'
-    +(interventi.length?interventi.map(iv=>'<div class="intervento-row"><div class="int-header"><span class="int-date">'+iv.data+'</span><span class="int-tipo">'+(tipoIcon[iv.tipo]||'📝')+' '+iv.tipo+'</span><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-xs" onclick="editIntervento(\''+id+'\',\''+iv.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteIntervento(\''+id+'\',\''+iv.id+'\')">✕</button></div></div><div class="int-desc">'+iv.desc+'</div>'+(iv.tecnico?'<div class="int-tech">👤 '+iv.tecnico+' · <span style="'+( esitoStyle[iv.esito]||'')+'">'+(iv.esito||'')+'</span></div>':'')+(iv.note?'<div class="int-tech" style="margin-top:2px">'+iv.note+'</div>':'')+'</div>').join(''):'<div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:20px">🔧</div><p>Nessun intervento registrato.</p></div>')
-    // footer buttons
+    // interventi di assistenza (3 campi)
+    +'<div class="panel-section-label" style="display:flex;align-items:center;justify-content:space-between"><span>Interventi di Assistenza ('+interventi.length+')</span><button class="btn btn-primary btn-xs" onclick="openNewIntervento(\''+id+'\')">＋ Aggiungi</button></div>'
+    +(interventi.length?interventi.map(iv=>
+      '<div class="intervento-row">'
+      +'<div class="int-header">'
+      +'<span class="int-date">📅 '+iv.data+'</span>'
+      +(iv.totem?'<span class="badge b-blue" style="font-size:9px;margin-left:6px">🖥 '+iv.totem+'</span>':'')
+      +'<div style="display:flex;gap:4px;margin-left:auto">'
+      +'<button class="btn btn-ghost btn-xs" onclick="editIntervento(\''+id+'\',\''+iv.id+'\')">✎</button>'
+      +'<button class="btn btn-danger btn-xs" onclick="deleteIntervento(\''+id+'\',\''+iv.id+'\')">✕</button>'
+      +'</div></div>'
+      +'<div class="int-desc">'+iv.desc+'</div>'
+      +'</div>').join('')
+    :'<div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:20px">🔧</div><p>Nessun intervento registrato.</p></div>')
     +'<div style="margin-top:14px;display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="editOrdine(\''+id+'\');closePanel(\'panel-ordine\')">✎ Modifica</button></div>';
   document.getElementById('panel-ordine').classList.add('open');
 }
