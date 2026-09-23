@@ -849,11 +849,12 @@ function editCliente(id){
 function deleteCliente(id){if(!confirm('Eliminare questo cliente?'))return;const c=db.clienti.find(x=>x.id===id);db.clienti=db.clienti.filter(x=>x.id!==id);log('Cliente eliminato',c?.azienda||'');saveDB();renderClienti();toast('Eliminato',true);}
 function renderClienti(){
   const thead=document.getElementById('cl-thead');
-  if(thead)thead.innerHTML=mkTh('Azienda','azienda','cl')+mkTh('Sede','sede','cl')+mkTh('Settore','settore','cl')+mkTh('Tipologia','tipologia','cl')+'<th>Progetti</th><th>Azioni</th>';
+  if(thead)thead.innerHTML=mkTh('Azienda','azienda','cl')+mkTh('Sede','sede','cl')+mkTh('Settore','settore','cl')+mkTh('Tipologia','tipologia','cl')+mkTh('Progetti','_progetti','cl')+'<th>Azioni</th>';
   const tb=document.getElementById('tb-clienti');
   if(!db.clienti.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">👤</div><p>Nessun cliente.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-cliente\')">＋ Aggiungi</button></p></div></td></tr>';return;}
   const s=sortState.cl;
-  let data=applySort(db.clienti,s.col,s.dir);
+  const fn=s.col==='_progetti'?(c=>String(db.ordini.filter(o=>o.clienteId===c.id).length).padStart(6,'0')):null;
+  let data=applySort(db.clienti,fn?null:s.col,s.dir,fn?(c=>fn(c)):null);
   tb.innerHTML=data.map(c=>{
     const n=db.ordini.filter(o=>o.clienteId===c.id).length;
     return '<tr><td><strong style="color:var(--blue)">'+c.azienda+'</strong></td><td>'+(c.sede||'—')+'</td><td>'+(c.settore||'—')+'</td><td><span class="badge b-blue">'+c.tipologia+'</span></td><td>'+(n?'<span class="badge b-green">'+n+' progetti</span>':'—')+'</td><td><div class="actions-cell"><button class="btn btn-ghost btn-xs" onclick="showClienteDetail(\''+c.id+'\')">▶ Dettaglio</button><button class="btn btn-ghost btn-xs" onclick="editCliente(\''+c.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteCliente(\''+c.id+'\')">✕</button></div></td></tr>';
@@ -883,11 +884,12 @@ function editFornitore(id){
 function deleteFornitore(id){if(!confirm('Eliminare?'))return;const f=db.fornitori.find(x=>x.id===id);db.fornitori=db.fornitori.filter(x=>x.id!==id);log('Fornitore eliminato',f?.azienda||'');saveDB();renderFornitori();toast('Eliminato',true);}
 function renderFornitori(){
   const thead=document.getElementById('forn-thead');
-  if(thead)thead.innerHTML=mkTh('Azienda','azienda','forn')+mkTh('Sede','sede','forn')+mkTh('Settore','settore','forn')+mkTh('Tipologia','tipologia','forn')+'<th>Equipment</th><th>Azioni</th>';
+  if(thead)thead.innerHTML=mkTh('Azienda','azienda','forn')+mkTh('Sede','sede','forn')+mkTh('Settore','settore','forn')+mkTh('Tipologia','tipologia','forn')+mkTh('Equipment','_equipment','forn')+'<th>Azioni</th>';
   const tb=document.getElementById('tb-fornitori');
   if(!db.fornitori.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">🏭</div><p>Nessun fornitore.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-fornitore\')">＋ Aggiungi</button></p></div></td></tr>';return;}
   const s=sortState.forn;
-  let data=applySort(db.fornitori,s.col,s.dir);
+  const fn=s.col==='_equipment'?(f=>String(db.equipment.filter(e=>(e.fornitoriIds||[]).includes(f.id)).length).padStart(6,'0')):null;
+  let data=applySort(db.fornitori,fn?null:s.col,s.dir,fn?(f=>fn(f)):null);
   tb.innerHTML=data.map(f=>{
     const n=db.equipment.filter(e=>(e.fornitoriIds||[]).includes(f.id)).length;
     return '<tr><td><strong style="color:var(--blue)">'+f.azienda+'</strong></td><td>'+(f.sede||'—')+'</td><td>'+(f.settore||'—')+'</td><td><span class="badge b-gray">'+f.tipologia+'</span></td><td>'+(n?'<span class="badge b-green">'+n+' comp.</span>':'—')+'</td><td><div class="actions-cell"><button class="btn btn-ghost btn-xs" onclick="editFornitore(\''+f.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteFornitore(\''+f.id+'\')">✕</button></div></td></tr>';
@@ -943,11 +945,12 @@ function buildEqBar(){
 function filterEq(f,btn){eqFilter=f;document.querySelectorAll('#eq-filter-bar .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderEquipment();}
 function renderEquipment(){
   const thead=document.getElementById('eq-thead');
-  if(thead)thead.innerHTML=mkTh('Tipologia','tipologia','eq')+mkTh('Codice','device','eq')+mkTh('Dettaglio','dettaglio','eq')+mkTh('Variante','variante','eq')+mkTh('Accessori','accessori','eq')+'<th>Fornitori</th><th>Azioni</th>';
+  if(thead)thead.innerHTML=mkTh('Tipologia','tipologia','eq')+mkTh('Codice','device','eq')+mkTh('Dettaglio','dettaglio','eq')+mkTh('Variante','variante','eq')+mkTh('Accessori','accessori','eq')+mkTh('Fornitori','_fornitori','eq')+'<th>Azioni</th>';
   let data=eqFilter==='tutti'?db.equipment:db.equipment.filter(e=>e.tipologia===eqFilter);
   if(eqSearch){const q=eqSearch.toLowerCase();data=data.filter(e=>(e.device||'').toLowerCase().includes(q)||(e.dettaglio||'').toLowerCase().includes(q)||(e.variante||'').toLowerCase().includes(q)||(e.accessori||'').toLowerCase().includes(q)||(e.tipologia||'').toLowerCase().includes(q));}
   const s=sortState.eq;
-  data=applySort(data,s.col,s.dir);
+  const fn=s.col==='_fornitori'?(e=>String((e.fornitoriIds||[]).length).padStart(6,'0')):null;
+  data=applySort(data,fn?null:s.col,s.dir,fn?(e=>fn(e)):null);
   const tb=document.getElementById('tb-equipment');
   if(!data.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">⚙</div><p>Nessun equipment trovato.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-equipment\')">＋ Aggiungi</button></p></div></td></tr>';return;}
   tb.innerHTML=data.map(e=>{
@@ -1030,11 +1033,12 @@ function editKiosk(id){
 function deleteKiosk(id){if(!confirm('Eliminare?'))return;const k=db.kiosk.find(x=>x.id===id);db.kiosk=db.kiosk.filter(x=>x.id!==id);log('Kiosk eliminato',k?.modello||'');saveDB();renderKiosk();toast('Eliminato',true);refreshSel();}
 function renderKiosk(){
   const thead=document.getElementById('kiosk-thead');
-  if(thead)thead.innerHTML=mkTh('Modello','modello','kiosk')+mkTh('Versione','versione','kiosk')+'<th>Equipment</th>'+mkTh('Note','note','kiosk')+'<th>Azioni</th>';
+  if(thead)thead.innerHTML=mkTh('Modello','modello','kiosk')+mkTh('Versione','versione','kiosk')+mkTh('Equipment','_equipment','kiosk')+mkTh('Note','note','kiosk')+'<th>Azioni</th>';
   const tb=document.getElementById('tb-kiosk');
   if(!db.kiosk.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">🖥</div><p>Nessun kiosk.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="openM(\'m-kiosk\')">＋ Aggiungi</button></p></div></td></tr>';return;}
   const s=sortState.kiosk;
-  let data=applySort(db.kiosk,s.col,s.dir);
+  const fn=s.col==='_equipment'?(k=>String((k.equipmentIds||[]).length).padStart(6,'0')):null;
+  let data=applySort(db.kiosk,fn?null:s.col,s.dir,fn?(k=>fn(k)):null);
   tb.innerHTML=data.map(k=>{
     const nE=(k.equipmentIds||[]).length;
     return '<tr><td><strong style="color:var(--blue)">'+k.modello+'</strong></td><td><span class="badge b-gray">'+(k.versione||'—')+'</span></td><td>'+(nE?'<span class="badge b-green">'+nE+' comp.</span>':'—')+'</td><td style="font-size:11px;color:var(--text-lt);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(k.note||'—')+'</td><td><div class="actions-cell"><button class="btn btn-ghost btn-xs" onclick="showKioskDetail(\''+k.id+'\')">▶ Dettaglio</button><button class="btn btn-ghost btn-xs" onclick="editKiosk(\''+k.id+'\')">✎</button><button class="btn btn-danger btn-xs" onclick="deleteKiosk(\''+k.id+'\')">✕</button></div></td></tr>';
@@ -1211,7 +1215,7 @@ function scadenzaStatus(incl,fine){
 }
 function renderOrdini(){
   const thead=document.getElementById('ord-thead');
-  if(thead)thead.innerHTML=mkTh('Codice','codice','ord')+mkTh('Cliente','_cliente','ord')+mkTh('Kiosk','_kiosk','ord')+mkTh('Data Ordine','dataOrdine','ord')+mkTh('Consegna','dataConsegna','ord')+mkTh('Qtà','qta','ord')+mkTh('Costo Tot.','costoTot','ord')+'<th>Garanzia</th><th>Assistenza</th>'+mkTh('Stato','stato','ord')+'<th>Azioni</th>';
+  if(thead)thead.innerHTML=mkTh('Codice','codice','ord')+mkTh('Cliente','_cliente','ord')+mkTh('Kiosk','_kiosk','ord')+mkTh('Data Ordine','dataOrdine','ord')+mkTh('Consegna','dataConsegna','ord')+mkTh('Qtà','qta','ord')+mkTh('Costo Tot.','costoTot','ord')+mkTh('Garanzia','_garanzia','ord')+mkTh('Assistenza','_assistenza','ord')+mkTh('Stato','stato','ord')+'<th>Azioni</th>';
   const dal=document.getElementById('ord-dal').value,al=document.getElementById('ord-al').value;
   let data=ordFilter==='tutti'?db.ordini:db.ordini.filter(o=>o.stato===ordFilter);
   if(dal)data=data.filter(o=>(o.dataOrdine||'')>=dal);
@@ -1226,9 +1230,13 @@ function renderOrdini(){
   }
   // Sort: per colonne speciali (_cliente, _kiosk) uso fn custom
   const s=sortState.ord;
+  const garanziaScore=o=>{const g=scadenzaStatus(o.garanziaIncl,o.garanziaFine);return g.cls==='ok'?'1':g.cls==='warn'?'2':g.cls==='expired'?'3':'4';};
+  const assistScore=o=>{const a=scadenzaStatus(o.assistIncl,o.assistFine);return a.cls==='ok'?'1':a.cls==='warn'?'2':a.cls==='expired'?'3':'4';};
   if(s.col&&s.dir){
     const fn=s.col==='_cliente'?(o=>{const c=db.clienti.find(x=>x.id===o.clienteId);return(c?.azienda||'').toLowerCase();})
       :s.col==='_kiosk'?(o=>{const k=db.kiosk.find(x=>x.id===o.kioskId);return(k?.modello||'').toLowerCase();})
+      :s.col==='_garanzia'?(o=>garanziaScore(o))
+      :s.col==='_assistenza'?(o=>assistScore(o))
       :s.col==='qta'?(o=>(parseFloat(o.qta)||0).toString().padStart(10,'0'))
       :s.col==='costoTot'?(o=>(parseFloat(o.costoTot)||0).toString().padStart(15,'0'))
       :null;
